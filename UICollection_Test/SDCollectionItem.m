@@ -23,9 +23,7 @@
     
     if (self) {
         [self setCustomLayout];
-    }
-    
-    
+    }    
     return self;
 
 }
