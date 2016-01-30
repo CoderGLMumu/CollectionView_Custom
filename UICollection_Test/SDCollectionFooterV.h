@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+
 @class SDCollectionFooterV;
 @protocol CollectionFooterVDelegate <NSObject>
 

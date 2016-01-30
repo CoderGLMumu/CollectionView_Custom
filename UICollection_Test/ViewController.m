@@ -13,15 +13,19 @@
 #import "SDAddItem.h"
 #import "SDData.h"
 
+#define kScreenWidth  self.view.frame.size.width
+#define kScreenHeight  self.view.frame.size.height
+
+#define kMinCount 1
+
 NSString *const KCellIdentifier = @"NormalCell";
 NSString *const KAddCellIdentifier = @"AddCell";
-NSString *const KHeaderIdentifier = @"header";
-NSString *const KFooterIdentifier = @"footer";
+NSString *const KHeaderIdentifier = @"Header";
+NSString *const KFooterIdentifier = @"Footer";
 
-@interface ViewController ()<UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout,CollectionHeaderVDelegate,AddItemDelegate,CollectionItemDelegate,CollectionFooterVDelegate>
+@interface ViewController ()<UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout,CollectionFooterVDelegate,CollectionHeaderVDelegate>
 
 @property (nonatomic , strong) UICollectionView *collection;
-@property (nonatomic , strong) SDCollectionHeaderV *headerView;
 @property (nonatomic , strong) NSMutableArray *dataArr;
 
 @end
@@ -30,24 +34,17 @@ NSString *const KFooterIdentifier = @"footer";
 
 - (NSMutableArray *)dataArr{
 
-    if (_dataArr == nil) {
-        
-        _dataArr = [[NSMutableArray alloc] init];
-    }
+    if (_dataArr == nil) { _dataArr = [NSMutableArray array];}
     return _dataArr;
-
 }
 
 - (instancetype)init {
-
-    self = [super init];
     
-    if (self) {
+    if (self = [super init]) {
         
         SDData *data = [[SDData alloc] init];
-        data.count = 1;
+        data.count = kMinCount;
         [self.dataArr addObject:data];
-        
     }
     return self;
 }
@@ -55,9 +52,14 @@ NSString *const KFooterIdentifier = @"footer";
 - (void)viewDidLoad {
     
     [super viewDidLoad];
-    
+
     self.view.backgroundColor = [UIColor whiteColor];
-    self.navigationItem.title = @"CollectionView";
+
+    UILabel *titleName = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 24)];
+    titleName.text = @"CollectionView";
+    titleName.textAlignment = NSTextAlignmentCenter;
+    titleName.font = [UIFont fontWithName:@"Avenir Next Medium" size:24.0];
+    self.navigationItem.titleView = titleName;
 
     self.collection = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height) collectionViewLayout:[[UICollectionViewFlowLayout alloc] init]];
     self.collection.backgroundColor = [UIColor whiteColor];
@@ -72,6 +74,7 @@ NSString *const KFooterIdentifier = @"footer";
     [self.collection registerClass:[SDCollectionFooterV class] forSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:KFooterIdentifier];
     
 }
+
 
 #pragma mark - UICollectionViewDataSource 代理
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
@@ -94,53 +97,43 @@ NSString *const KFooterIdentifier = @"footer";
         
         SDAddItem *item = [collectionView dequeueReusableCellWithReuseIdentifier:KAddCellIdentifier forIndexPath:indexPath];
         item.index = indexPath;
-        item.delegate = self;
+        item.block = ^(NSIndexPath *index) {
+            
+            NSLog(@"section : %zd row :%zd",index.section,index.row);
+            SDData *data = self.dataArr[index.section];
+            data.count++;
+            
+            [self.collection performBatchUpdates:^{
+                [self.collection insertItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:data.count-1 inSection:index.section]]];
+            } completion:^(BOOL finished) {
+                [self.collection scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:data.count-1 inSection:index.section] atScrollPosition:UICollectionViewScrollPositionBottom animated:YES];
+                [self.collection reloadData];
+            }];
+        };
         return item;
         
     }else{
         
         SDCollectionItem *item = [collectionView dequeueReusableCellWithReuseIdentifier:KCellIdentifier forIndexPath:indexPath];
         
-        item.itemNameLabel.text = [NSString stringWithFormat:@"Item : %ld",indexPath.row];
+        item.itemNameLabel.text = [NSString stringWithFormat:@"Item : %zd",indexPath.row];
         item.itemNameLabel.textAlignment = NSTextAlignmentCenter;
         item.index = indexPath;
-        item.delegate = self;
+
+        item.block = ^(NSIndexPath *index) {
+            
+            SDData *data = self.dataArr[index.section];
+            data.count--;
+            
+            [self.collection performBatchUpdates:^{
+                [self.collection deleteItemsAtIndexPaths:@[index]];
+            } completion:^(BOOL finished) {
+                [self.collection reloadData];
+            }];
+        
+        };
         return item;
     }
-    
-}
-
-#pragma mark - CollectionItemDelegate 代理
-
-- (void) collectionItem:(SDCollectionItem *)item withIndex:(NSIndexPath *)index{
-
-    SDData *data = self.dataArr[index.section];
-    data.count--;
-    
-    [self.collection performBatchUpdates:^{
-        [self.collection deleteItemsAtIndexPaths:@[index]];
-    } completion:^(BOOL finished) {
-        [self.collection reloadData];
-    }];
-    
-
-}
-
-
-#pragma mark - AddItemDelegate 代理
-- (void)addItem:(SDAddItem *)item withItemRow:(NSIndexPath *)index{
-
-    NSLog(@"section : %ld row :%ld",index.section,index.row);
-    SDData *data = self.dataArr[index.section];
-    data.count++;
-
-    [self.collection performBatchUpdates:^{
-        [self.collection insertItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:data.count-1 inSection:index.section]]];
-    } completion:^(BOOL finished) {
-        [self.collection scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:data.count-1 inSection:index.section] atScrollPosition:UICollectionViewScrollPositionBottom animated:YES];
-        [self.collection reloadData];
-    }];
-    
     
 }
 
@@ -151,11 +144,12 @@ NSString *const KFooterIdentifier = @"footer";
     
     if (kind == UICollectionElementKindSectionHeader) {
         
-         _headerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:KHeaderIdentifier forIndexPath:indexPath];
-        _headerView.sectionLabel.text = [NSString stringWithFormat:@"Section : %ld",indexPath.section];
-        _headerView.btn.tag = indexPath.section;
-        _headerView.delegate = self;
-        reusableV = _headerView;
+         SDCollectionHeaderV *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:KHeaderIdentifier forIndexPath:indexPath];
+        headerView.sectionLabel.text = [NSString stringWithFormat:@"Section : %zd",indexPath.section];
+        headerView.btn.tag = indexPath.section;
+        headerView.delegate = self;
+        reusableV = headerView;
+        
     }else{
     
         SDCollectionFooterV *footer = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:KFooterIdentifier forIndexPath:indexPath];
@@ -163,7 +157,6 @@ NSString *const KFooterIdentifier = @"footer";
         footer.deleteSectionBtn.tag = indexPath.section;
         footer.delegate = self;
         reusableV = footer;
-    
     }
     
     return reusableV;
@@ -171,7 +164,7 @@ NSString *const KFooterIdentifier = @"footer";
 
 #pragma mark - CollectionFooterVDelegate 代理
 - (void)collectionFooterV:(SDCollectionFooterV *)footer withIndex:(NSInteger)index {
-
+    
     if (self.dataArr.count > 1) {
         
         NSMutableIndexSet *indexSet = [NSMutableIndexSet indexSetWithIndex:index];
@@ -185,11 +178,12 @@ NSString *const KFooterIdentifier = @"footer";
     }
 }
 
+
 #pragma mark - SDCollectionHeaderV 代理
 - (void)collectionHeaderV:(SDCollectionHeaderV *)header withSection:(NSInteger)index{
 
     SDData *newData = [[SDData alloc] init];
-    newData.count = 1;
+    newData.count = kMinCount;
     [self.dataArr addObject:newData];
     
     NSMutableIndexSet *indexSet = [NSMutableIndexSet indexSetWithIndex:self.dataArr.count-1];
@@ -206,7 +200,7 @@ NSString *const KFooterIdentifier = @"footer";
  */
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section{
     
-    return CGSizeMake(self.view.frame.size.width, 30);
+    return CGSizeMake(kScreenWidth, 30);
 }
 
 /**
@@ -214,7 +208,7 @@ NSString *const KFooterIdentifier = @"footer";
  */
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section{
     
-    CGSize size = {self.view.frame.size.width,30};
+    CGSize size = {kScreenWidth,30};
     return size;
 }
 
