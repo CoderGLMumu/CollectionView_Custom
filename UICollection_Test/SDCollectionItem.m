@@ -7,7 +7,6 @@
 //
 
 #import "SDCollectionItem.h"
-#import "Masonry.h"
 
 @interface SDCollectionItem()
 
@@ -37,7 +36,7 @@
     self.itemNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, 40)];
     self.itemNameLabel.center = self.contentView.center;
     self.itemNameLabel.textColor = [UIColor whiteColor];
-    self.itemNameLabel.font = [UIFont systemFontOfSize:24.0f];
+    self.itemNameLabel.font = [UIFont fontWithName:@"Avenir Next Medium" size:22.0];
     [self.contentView addSubview:self.itemNameLabel];
     
     self.deleteBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height)];
@@ -49,8 +48,12 @@
 
 - (void) clickDeleteBtn : (UIButton *)sender {
 
-    if ([self.delegate respondsToSelector:@selector(collectionItem:withIndex:)]) {
-        [self.delegate collectionItem:self withIndex:self.index];
+//    if ([self.delegate respondsToSelector:@selector(collectionItem:withIndex:)]) {
+//        [self.delegate collectionItem:self withIndex:self.index];
+//    }
+    
+    if (_block) {
+        _block(self.index);
     }
 
 }

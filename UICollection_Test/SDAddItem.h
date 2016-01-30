@@ -10,16 +10,13 @@
 
 @class SDAddItem;
 
-@protocol AddItemDelegate <NSObject>
+typedef void (^clickItemBlock)(NSIndexPath *);
 
-- (void) addItem : (SDAddItem *)item withItemRow : (NSIndexPath *)index;
-
-@end
 
 @interface SDAddItem : UICollectionViewCell
 
 @property (nonatomic ,strong) UIButton *addBtn;
 @property (nonatomic ,strong) NSIndexPath *index;
-@property (nonatomic ,weak) id<AddItemDelegate>delegate;
+@property(nonatomic, copy) clickItemBlock block;
 
 @end

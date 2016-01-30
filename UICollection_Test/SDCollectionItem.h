@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 @class SDCollectionItem;
+typedef void (^clickItemBlock)(NSIndexPath *);
 @protocol CollectionItemDelegate <NSObject>
 
 - (void) collectionItem : (SDCollectionItem *)item withIndex :(NSIndexPath *)index;
@@ -21,5 +22,6 @@
 @property (nonatomic ,strong) UIButton *deleteBtn;
 @property (nonatomic ,strong) NSIndexPath *index;
 @property (nonatomic ,weak) id<CollectionItemDelegate>delegate;
+@property(nonatomic, copy) clickItemBlock block;
 
 @end

@@ -30,9 +30,10 @@
     self.layer.borderColor = [UIColor whiteColor].CGColor;
     
     self.deleteSectionBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.deleteSectionBtn.titleLabel.font = [UIFont fontWithName:@"Avenir Next Medium" size:20];
+    self.deleteSectionBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft ;
     [self.deleteSectionBtn setTitle:@"Delete Section" forState:UIControlStateNormal];
     [self.deleteSectionBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    self.deleteSectionBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft ;
     [self.deleteSectionBtn addTarget:self action:@selector(clickDeleteBtn:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.deleteSectionBtn];
     

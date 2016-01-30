@@ -46,13 +46,10 @@
 }
 
 - (void) clickAddBtn :(UIButton *)sender {
-
-    if ([self.delegate respondsToSelector:@selector(addItem:withItemRow:)]) {
-        
-        [self.delegate addItem:self withItemRow:self.index];
+    
+    if (_block) {
+        _block(self.index);
     }
-    
-    
 }
 
 
