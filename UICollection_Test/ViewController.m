@@ -13,11 +13,6 @@
 #import "SDAddItem.h"
 #import "SDData.h"
 
-#define kScreenWidth  self.view.frame.size.width
-#define kScreenHeight  self.view.frame.size.height
-
-#define kMinCount 1
-
 NSString *const KCellIdentifier = @"NormalCell";
 NSString *const KAddCellIdentifier = @"AddCell";
 NSString *const KHeaderIdentifier = @"Header";
@@ -25,14 +20,14 @@ NSString *const KFooterIdentifier = @"Footer";
 
 @interface ViewController ()<UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout,CollectionFooterVDelegate,CollectionHeaderVDelegate>
 
-@property (nonatomic , strong) UICollectionView *collection;
-@property (nonatomic , strong) NSMutableArray *dataArr;
+@property (nonatomic , weak) UICollectionView *collection;
+@property (nonatomic , strong) NSMutableArray<SDData *> *dataArr;
 
 @end
 
 @implementation ViewController
 
-- (NSMutableArray *)dataArr{
+- (NSMutableArray<SDData *> *)dataArr{
 
     if (_dataArr == nil) { _dataArr = [NSMutableArray array];}
     return _dataArr;
@@ -41,7 +36,6 @@ NSString *const KFooterIdentifier = @"Footer";
 - (instancetype)init {
     
     if (self = [super init]) {
-        
         SDData *data = [[SDData alloc] init];
         data.count = kMinCount;
         [self.dataArr addObject:data];
@@ -55,15 +49,16 @@ NSString *const KFooterIdentifier = @"Footer";
 
     self.view.backgroundColor = [UIColor whiteColor];
 
-    UILabel *titleName = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 24)];
+    UILabel *titleName = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, 24)];
     titleName.text = @"CollectionView";
     titleName.textAlignment = NSTextAlignmentCenter;
-    titleName.font = [UIFont fontWithName:@"Avenir Next Medium" size:24.0];
+    titleName.font = KTitleFontNameSize;
     self.navigationItem.titleView = titleName;
 
-    self.collection = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height) collectionViewLayout:[[UICollectionViewFlowLayout alloc] init]];
-    self.collection.backgroundColor = [UIColor whiteColor];
-    [self.view addSubview:self.collection];
+    UICollectionView *collectionV = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight) collectionViewLayout:[[UICollectionViewFlowLayout alloc] init]];
+    collectionV.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:collectionV];
+    self.collection = collectionV;
     
     self.collection.delegate = self;
     self.collection.dataSource = self;
@@ -86,13 +81,11 @@ NSString *const KFooterIdentifier = @"Footer";
 
     SDData *data = self.dataArr[section];
     return data.count;
-    
 }
 
 #pragma mark - 配置item
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
 
-    
     if (indexPath.row == [(SDData *)self.dataArr[indexPath.section] count] - 1) {
         
         SDAddItem *item = [collectionView dequeueReusableCellWithReuseIdentifier:KAddCellIdentifier forIndexPath:indexPath];
@@ -115,10 +108,8 @@ NSString *const KFooterIdentifier = @"Footer";
     }else{
         
         SDCollectionItem *item = [collectionView dequeueReusableCellWithReuseIdentifier:KCellIdentifier forIndexPath:indexPath];
-        
-        item.itemNameLabel.text = [NSString stringWithFormat:@"Item : %zd",indexPath.row];
-        item.itemNameLabel.textAlignment = NSTextAlignmentCenter;
         item.index = indexPath;
+        item.labelName = [NSString stringWithFormat:@"Item : %zd",indexPath.row];
 
         item.block = ^(NSIndexPath *index) {
             
@@ -130,11 +121,9 @@ NSString *const KFooterIdentifier = @"Footer";
             } completion:^(BOOL finished) {
                 [self.collection reloadData];
             }];
-        
         };
         return item;
     }
-    
 }
 
 #pragma mark - 配置Header和Footer
@@ -145,8 +134,8 @@ NSString *const KFooterIdentifier = @"Footer";
     if (kind == UICollectionElementKindSectionHeader) {
         
          SDCollectionHeaderV *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:KHeaderIdentifier forIndexPath:indexPath];
-        headerView.sectionLabel.text = [NSString stringWithFormat:@"Section : %zd",indexPath.section];
-        headerView.btn.tag = indexPath.section;
+        headerView.text = [NSString stringWithFormat:@"Section : %zd",indexPath.section];
+        headerView.index = indexPath.section;
         headerView.delegate = self;
         reusableV = headerView;
         
@@ -154,11 +143,10 @@ NSString *const KFooterIdentifier = @"Footer";
     
         SDCollectionFooterV *footer = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:KFooterIdentifier forIndexPath:indexPath];
         
-        footer.deleteSectionBtn.tag = indexPath.section;
+        footer.index = indexPath.section;
         footer.delegate = self;
         reusableV = footer;
     }
-    
     return reusableV;
 }
 
@@ -193,23 +181,15 @@ NSString *const KFooterIdentifier = @"Footer";
 
 }
 
-
 #pragma mark - UICollectionViewDelegateFlowLayout 代理
-/**
- *  返回头headerView的大小
- */
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section{
     
     return CGSizeMake(kScreenWidth, 30);
 }
 
-/**
- *  返回头footerView的大小
- */
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section{
     
-    CGSize size = {kScreenWidth,30};
-    return size;
+    return CGSizeMake(kScreenWidth, 30);
 }
 
 -(CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section{
@@ -224,7 +204,6 @@ NSString *const KFooterIdentifier = @"Footer";
 
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
 
-    return CGSizeMake((CGRectGetWidth(self.view.bounds) / 4) - 0.5,(CGRectGetWidth(self.view.bounds) / 4)-0.5);
-
+    return CGSizeMake((kScreenWidth / 4) - 0.5,(kScreenWidth / 4)-0.5);
 }
 @end

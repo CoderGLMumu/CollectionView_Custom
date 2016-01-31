@@ -10,52 +10,61 @@
 
 @interface SDCollectionItem()
 
-
+@property (nonatomic ,weak) UILabel *itemNameLabel;
+@property (nonatomic ,weak) UIButton *deleteBtn;
 
 @end
 
 @implementation SDCollectionItem
 
 - (instancetype)initWithFrame:(CGRect)frame {
-
-    self = [super initWithFrame:frame];
     
-    if (self) {
+    if ([super initWithFrame:frame]) {
         [self setCustomLayout];
     }    
     return self;
-
 }
 
 - (void) setCustomLayout {
     
-    self.backgroundColor = [UIColor colorWithRed:176.f/255.f green:68.f/255.f blue:54.f/255.f alpha:1.0];
+    self.backgroundColor = KItemBackgroudColor;
     self.layer.borderWidth = 2.0;
     self.layer.borderColor = [UIColor whiteColor].CGColor;
+    /** item 名字 */
+    UILabel *nameLabel = [[UILabel alloc] init];
+    nameLabel.center = self.contentView.center;
+    nameLabel.textColor = [UIColor whiteColor];
+    nameLabel.font = KNormalItemFontNameSize;
+    nameLabel.textAlignment = NSTextAlignmentCenter;
+
+    [self.contentView addSubview:nameLabel];
+    self.itemNameLabel = nameLabel;
+    [self.itemNameLabel makeConstraints:^(MASConstraintMaker *make) {
+        make.leading.equalTo(0);
+        make.center.equalTo(self);
+    }];
     
-    self.itemNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, 40)];
-    self.itemNameLabel.center = self.contentView.center;
-    self.itemNameLabel.textColor = [UIColor whiteColor];
-    self.itemNameLabel.font = [UIFont fontWithName:@"Avenir Next Medium" size:22.0];
-    [self.contentView addSubview:self.itemNameLabel];
-    
-    self.deleteBtn = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height)];
-    self.deleteBtn.backgroundColor = [UIColor clearColor];
-    [self.deleteBtn addTarget:self action:@selector(clickDeleteBtn:) forControlEvents:UIControlEventTouchUpInside];
-    [self.contentView addSubview:self.deleteBtn];
-    
+    /** 删除按钮 */
+    UIButton *btn = [[UIButton alloc] init];
+    btn.backgroundColor = [UIColor clearColor];
+    [btn addTarget:self action:@selector(clickDeleteBtn:) forControlEvents:UIControlEventTouchUpInside];
+    [self.contentView addSubview:btn];
+    self.deleteBtn = btn;
+    [self.deleteBtn makeConstraints:^(MASConstraintMaker *make) {
+        make.leading.equalTo(0);
+        make.top.equalTo(0);
+        make.size.equalTo(self);
+    }];
 }
 
 - (void) clickDeleteBtn : (UIButton *)sender {
 
-//    if ([self.delegate respondsToSelector:@selector(collectionItem:withIndex:)]) {
-//        [self.delegate collectionItem:self withIndex:self.index];
-//    }
-    
-    if (_block) {
-        _block(self.index);
-    }
+    if (_block) _block(self.index);
+}
 
+- (void)setLabelName:(NSString *)labelName {
+    
+    self.itemNameLabel.text = labelName;
 }
 
 @end

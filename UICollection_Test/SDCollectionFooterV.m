@@ -7,7 +7,12 @@
 //
 
 #import "SDCollectionFooterV.h"
-#import "Masonry.h"
+
+@interface SDCollectionFooterV()
+
+@property (nonatomic ,weak) UIButton *deleteSectionBtn;
+
+@end
 
 @implementation SDCollectionFooterV
 
@@ -29,28 +34,29 @@
     self.layer.borderWidth = 3.0;
     self.layer.borderColor = [UIColor whiteColor].CGColor;
     
-    self.deleteSectionBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    self.deleteSectionBtn.titleLabel.font = [UIFont fontWithName:@"Avenir Next Medium" size:20];
-    self.deleteSectionBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft ;
-    [self.deleteSectionBtn setTitle:@"Delete Section" forState:UIControlStateNormal];
-    [self.deleteSectionBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    [self.deleteSectionBtn addTarget:self action:@selector(clickDeleteBtn:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:self.deleteSectionBtn];
+    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn.titleLabel.font = kFooterFontNameSize;
+    btn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft ;
+    [btn setTitle:@"Delete Section" forState:UIControlStateNormal];
+    [btn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [btn addTarget:self action:@selector(clickDeleteBtn:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:btn];
+    self.deleteSectionBtn = btn;
     
-    [self.deleteSectionBtn mas_makeConstraints:^(MASConstraintMaker *make){
-    
-        make.top.equalTo(@0);
-        make.left.equalTo(@10);
-        make.width.equalTo(@(self.bounds.size.width - 10));
-        make.height.equalTo(@(self.bounds.size.height));
+    [self.deleteSectionBtn makeConstraints:^(MASConstraintMaker *make){
+        make.left.equalTo(10);
+        make.center.equalTo(self);
     }];
 }
 
+- (void)setIndex:(NSInteger)index {
+
+    self.deleteSectionBtn.tag = index;
+}
 
 - (void) clickDeleteBtn : (UIButton *)sender {
 
     if ([self.delegate respondsToSelector:@selector(collectionFooterV:withIndex:)]) {
-        
         [self.delegate collectionFooterV:self withIndex:sender.tag];
     }
 }
