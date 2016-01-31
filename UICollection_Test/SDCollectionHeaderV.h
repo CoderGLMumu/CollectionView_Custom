@@ -18,8 +18,8 @@
 
 @interface SDCollectionHeaderV : UICollectionReusableView
 
-@property (nonatomic ,strong) UILabel *sectionLabel;
-@property (nonatomic ,strong) UIButton *btn;
+@property(nonatomic, copy) NSString *text;
+@property(nonatomic,assign) NSInteger index;
 @property (nonatomic ,weak) id<CollectionHeaderVDelegate>delegate;
 
 @end

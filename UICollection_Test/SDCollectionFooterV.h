@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @class SDCollectionFooterV;
+
 @protocol CollectionFooterVDelegate <NSObject>
 
 - (void) collectionFooterV : (SDCollectionFooterV *)footer withIndex : (NSInteger)index;
@@ -17,7 +18,7 @@
 
 @interface SDCollectionFooterV : UICollectionReusableView
 
-@property (nonatomic ,strong) UIButton *deleteSectionBtn;
-@property (nonatomic ,weak) id<CollectionFooterVDelegate>delegate;
+@property (nonatomic ,weak) id<CollectionFooterVDelegate> delegate;
+@property(nonatomic,assign) NSInteger index;
 
 @end

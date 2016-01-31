@@ -1,0 +1,32 @@
+//
+//  PrefixHeader.pch
+//  UICollection_Test
+//
+//  Created by Sunny on 16/1/31.
+//  Copyright © 2016年 Sunny. All rights reserved.
+//
+
+#ifdef __OBJC__
+
+#define kScreenWidth            [UIScreen mainScreen].bounds.size.width
+#define kScreenHeight           [UIScreen mainScreen].bounds.size.height
+
+#define KTitleFontNameSize      [UIFont fontWithName:@"Avenir Next Medium" size:24.0]
+#define kFooterFontNameSize     [UIFont fontWithName:@"Avenir Next Medium" size:20]
+#define KHeaderFontNameSize     [UIFont fontWithName:@"Avenir Next Medium" size:18]
+#define KNormalItemFontNameSize [UIFont fontWithName:@"Avenir Next Medium" size:22.0]
+
+#define KHeaderBackgroudColor   [UIColor colorWithRed:52.f/255.f green:128.f/255.f  blue:173.f/255.f  alpha:1.0f]
+#define KItemBackgroudColor     [UIColor colorWithRed:176.f/255.f green:68.f/255.f blue:54.f/255.f alpha:1.0]
+
+#define kMinCount 1
+
+//define this constant if you want to use Masonry without the 'mas_' prefix
+#define MAS_SHORTHAND
+
+//define this constant if you want to enable auto-boxing for default syntax
+#define MAS_SHORTHAND_GLOBALS
+
+#import "Masonry.h"
+
+#endif

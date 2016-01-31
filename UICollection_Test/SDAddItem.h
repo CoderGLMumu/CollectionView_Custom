@@ -8,14 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@class SDAddItem;
-
 typedef void (^clickItemBlock)(NSIndexPath *);
-
 
 @interface SDAddItem : UICollectionViewCell
 
-@property (nonatomic ,strong) UIButton *addBtn;
 @property (nonatomic ,strong) NSIndexPath *index;
 @property(nonatomic, copy) clickItemBlock block;
 

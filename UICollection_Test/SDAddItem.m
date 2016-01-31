@@ -9,47 +9,47 @@
 #import "SDAddItem.h"
 #import "Masonry.h"
 
+@interface SDAddItem ()
+
+@property (nonatomic ,weak) UIButton *addBtn;
+
+@end
+
 @implementation SDAddItem
 
 - (instancetype)initWithFrame:(CGRect)frame{
 
-    self = [super initWithFrame:frame];
-    if (self) {
-        
-        [self setCustomLayout];
-        
+    if (self = [super initWithFrame:frame]) {
+       [self setCustomLayout]; 
     }
     return self;
 }
 
 - (void) setCustomLayout {
 
-    self.backgroundColor = [UIColor colorWithRed:176.f/255.f green:68.f/255.f blue:54.f/255.f alpha:1.0];
+    self.backgroundColor = KItemBackgroudColor;
     self.layer.borderWidth = 2.0;
     self.layer.borderColor = [UIColor whiteColor].CGColor;
     
-    self.addBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.addBtn setTitle:@"+" forState:UIControlStateNormal];
-    self.addBtn.titleLabel.font = [UIFont systemFontOfSize:35.0];
-    [self.addBtn addTarget:self action:@selector(clickAddBtn:) forControlEvents:UIControlEventTouchUpInside];
-    [self.contentView addSubview:self.addBtn];
+    /** 添加按钮 */
+    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn.titleLabel.font = [UIFont systemFontOfSize:35.0];
+    [btn setTitle:@"+" forState:UIControlStateNormal];
+    [btn addTarget:self action:@selector(clickAddBtn:) forControlEvents:UIControlEventTouchUpInside];
+    [self.contentView addSubview:btn];
+    self.addBtn = btn;
     
     [self.addBtn mas_makeConstraints:^(MASConstraintMaker *make){
-    
-        make.top.equalTo(@0);
-        make.left.equalTo(@0);
-        make.width.equalTo(@(self.bounds.size.width));
-        make.height.equalTo(@(self.bounds.size.height));
-    
+        make.top.equalTo(0);
+        make.left.equalTo(0);
+        make.size.equalTo(self);
     }];
 
 }
 
 - (void) clickAddBtn :(UIButton *)sender {
     
-    if (_block) {
-        _block(self.index);
-    }
+    if (_block) _block(self.index);
 }
 
 
